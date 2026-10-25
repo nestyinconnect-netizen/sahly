@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sahly",
+  "main": "worker.js",
+  "compatibility_date": "2026-09-18",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "vars": {
+    "NOTIFY_EMAIL": "hello@example.com",
+    "FROM_EMAIL": "Sahly <hello@example.com>"
+  }
+}
