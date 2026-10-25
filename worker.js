@@ -255,7 +255,7 @@ function summarise(type, payload, reference) {
 }
 
 function collectAttachments(payload) {
-  const image = trim(payload.image)
+  const image = typeof payload.image === 'string' ? payload.image.trim() : ''
   if (!image || !image.startsWith('data:')) return undefined
   const [meta, base64] = image.split(',')
   if (!base64) return undefined
