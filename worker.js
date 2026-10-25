@@ -104,15 +104,16 @@ async function handleSubmit(request, env) {
   const reference = buildReference(type)
   const summary = summarise(type, payload, reference)
 
-  if (!env.RESEND_API_KEY || !env.COORDINATOR_EMAIL || !env.FROM_EMAIL) {
+  if (!env.RESEND_API_KEY || !env.COORDINATOR_EMAIL) {
     console.warn('Email is not configured; skipping send.')
     return json({ ok: true, reference, sent: false })
   }
 
   const attachments = collectAttachments(payload)
+  const fromEmail = env.RESEND_FROM_EMAIL || 'Sahly <onboarding@resend.dev>'
 
   const ownerEmail = {
-    from: env.FROM_EMAIL,
+    from: fromEmail,
     to: [env.COORDINATOR_EMAIL],
     reply_to: email,
     subject: `[${CATEGORY_LABEL[type]}] ${summary.subject}`,
@@ -122,7 +123,7 @@ async function handleSubmit(request, env) {
   }
 
   const userEmail = {
-    from: env.FROM_EMAIL,
+    from: fromEmail,
     to: [email],
     subject: `We received your ${summary.friendlyType} — ${reference}`,
     html: summary.userHtml,

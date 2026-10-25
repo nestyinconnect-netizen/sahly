@@ -24,8 +24,8 @@ Without the Worker running, forms will still validate but the API call fails. St
 The Worker uses [Resend](https://resend.com) because a single fetch call from Workers is enough to send email. Sign up (free tier is generous), verify your sending domain, then set the values:
 
 ```powershell
-# Public (stored in wrangler.jsonc)
-# FROM_EMAIL — verified sender (e.g. "Sahly <hello@yourdomain.com>")
+# Optional sender override (set only if you have a verified domain)
+# RESEND_FROM_EMAIL — e.g. "Sahly <hello@yourdomain.com>"
 
 # Secret (never commit; store in Cloudflare)
 wrangler secret put RESEND_API_KEY
@@ -37,8 +37,10 @@ For local Wrangler runs, put the same values in a `.dev.vars` file at the repo r
 ```
 RESEND_API_KEY=re_xxx
 COORDINATOR_EMAIL=hello@yourdomain.com
-FROM_EMAIL=Sahly <hello@yourdomain.com>
+# Optional: RESEND_FROM_EMAIL=Sahly <hello@yourdomain.com>
 ```
+
+Without `RESEND_FROM_EMAIL`, the Worker uses Resend's `onboarding@resend.dev` test sender. Resend restricts test sends to the account owner's verified email address.
 
 If `RESEND_API_KEY` is missing the Worker still returns a success response with a reference id but skips the actual send, which keeps early demos usable.
 
