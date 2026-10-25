@@ -198,6 +198,20 @@ h1 em, h2 em { color: var(--coral); font-style: italic; }
 .trust-card p { color: #c1d0c9; font-size: 11px; line-height: 1.6; margin: 18px 0 0; }
 
 .list-page { background: var(--forest); }
+.contact-page { display: grid; grid-template-columns: .85fr 1.15fr; gap: clamp(28px, 6vw, 90px); align-items: start; }
+.contact-intro { padding: clamp(28px, 5vw, 58px); background: var(--forest); color: white; }
+.contact-intro h1 { margin: 18px 0 15px; font-size: clamp(46px, 6vw, 70px); line-height: 1; }
+.contact-intro > p { color: #d1ded8; line-height: 1.7; max-width: 440px; }
+.contact-promise { display: flex; gap: 12px; align-items: flex-start; margin-top: 45px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.18); color: #c9d7d1; font-size: 12px; line-height: 1.6; }
+.contact-promise svg { width: 21px; color: var(--lime); }
+.contact-promise strong { display: block; color: white; }
+.contact-form-wrap { min-width: 0; padding: 12px 0; }
+.contact-form { max-width: 720px; margin: 0 auto; }
+.contact-form .form-header h2 { font-size: 36px; }
+.contact-form .submit-button { width: 100%; }
+.contact-success { max-width: 620px; padding: 55px 0; }
+.contact-success h2 { font-size: clamp(34px, 4vw, 48px); margin: 12px 0; }
+.contact-success > p:not(.reference-code) { color: var(--muted); line-height: 1.7; }
 .list-intro { min-height: 500px; padding: 90px clamp(22px, 9vw, 140px); color: white; background-image: linear-gradient(90deg, transparent 49.8%, rgba(255,255,255,.07) 50%, transparent 50.2%); }
 .list-intro h1 { font-size: clamp(50px, 7vw, 84px); line-height: .98; max-width: 980px; margin: 19px 0 21px; }
 .list-intro h1 em { color: var(--lime); }
@@ -343,6 +357,8 @@ footer small { grid-column: 1/-1; color: #81938a; border-top: 1px solid rgba(255
   .detail-layout { grid-template-columns: 1fr; }
   .detail-info { padding: 0; }
   .detail-lower { grid-template-columns: 1fr; gap: 35px; }
+  .contact-page { grid-template-columns: 1fr; }
+  .contact-intro { max-width: none; }
   .trust-card { max-width: 500px; }
   .stats-grid { grid-template-columns: repeat(3, 1fr); }
   .stats-grid > div:nth-child(3) { border-right: 0; }

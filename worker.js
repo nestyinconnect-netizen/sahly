@@ -5,6 +5,7 @@ const CATEGORY_LABEL = {
   listing: 'LISTING',
   enquiry: 'ENQUIRY',
   wanted: 'WANTED',
+  contact: 'CONTACT',
 }
 
 const MESSAGE_CORS_HEADERS = {
@@ -51,11 +52,13 @@ async function handleMessage(request, env) {
     return messageJson({ success: false, message: 'Invalid request body' }, 400)
   }
 
+  const messageType = String(payload.messageType || '').toLowerCase()
+  const isContact = messageType === 'contact'
   const intent = [payload.type, payload.intent, payload.messageType].some((value) => String(value || '').toLowerCase() === 'rent') ? 'rent' : 'buy'
   const enquiryRequest = new Request(request.url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...payload, type: 'enquiry', intent }),
+    body: JSON.stringify({ ...payload, type: isContact ? 'contact' : 'enquiry', intent }),
   })
 
   try {
@@ -88,7 +91,7 @@ async function handleSubmit(request, env) {
   }
 
   const type = String(payload.type || '').toLowerCase()
-  if (!['listing', 'enquiry', 'wanted'].includes(type)) {
+  if (!['listing', 'enquiry', 'wanted', 'contact'].includes(type)) {
     return json({ ok: false, error: 'Unknown submission type' }, 400)
   }
 
@@ -153,6 +156,25 @@ async function sendResend(apiKey, email) {
 
 function summarise(type, payload, reference) {
   const location = trim(payload.location) || trim(payload.area) || 'Not specified'
+  if (type === 'contact') {
+    const subject = trim(payload.subject) || 'Contact message'
+    const rows = [
+      ['Reference', reference],
+      ['Name', trim(payload.name)],
+      ['Email', trim(payload.email)],
+      ['Phone', trim(payload.phone)],
+      ['Subject', subject],
+      ['Message', trim(payload.message)],
+    ]
+    return {
+      friendlyType: 'message',
+      subject,
+      ownerHtml: htmlTable(rows),
+      ownerText: textTable(rows),
+      userHtml: confirmationHtml('contact', reference, subject),
+      userText: confirmationText('contact', reference, subject),
+    }
+  }
   if (type === 'listing') {
     const mode = trim(payload.mode) || 'sell'
     const title = trim(payload.title) || 'Untitled product'
@@ -262,6 +284,7 @@ function confirmationHtml(type, reference, subject) {
     listing: `Thanks for listing <strong>${escapeHtml(subject)}</strong> with Sahly.`,
     enquiry: `Thanks for your enquiry about <strong>${escapeHtml(subject)}</strong>.`,
     wanted: `Thanks for telling us you're looking for <strong>${escapeHtml(subject)}</strong>.`,
+    contact: `Thanks for contacting Sahly about <strong>${escapeHtml(subject)}</strong>.`,
   }[type]
   return `<div style="font-family:'Helvetica Neue',Arial,sans-serif;color:#1f2b25;max-width:520px;"><h2 style="font-family:Georgia,serif;color:#164c3b;">You're on our list.</h2><p>${intro}</p><p>We review every submission personally and will email you shortly with the next step.</p><p style="background:#f2efe7;padding:12px 16px;border-radius:4px;">Reference <strong>${escapeHtml(reference)}</strong></p><p style="color:#68746d;font-size:12px;">— The Sahly team</p></div>`
 }
@@ -271,12 +294,13 @@ function confirmationText(type, reference, subject) {
     listing: `Thanks for listing ${subject} with Sahly.`,
     enquiry: `Thanks for your enquiry about ${subject}.`,
     wanted: `Thanks for telling us you're looking for ${subject}.`,
+    contact: `Thanks for contacting Sahly about ${subject}.`,
   }[type]
   return `${intro}\n\nWe review every submission personally and will email you shortly with the next step.\n\nReference: ${reference}\n\n— The Sahly team`
 }
 
 function buildReference(type) {
-  const prefix = { listing: 'SL', enquiry: 'EN', wanted: 'WT' }[type] || 'SS'
+  const prefix = { listing: 'SL', enquiry: 'EN', wanted: 'WT', contact: 'CT' }[type] || 'SS'
   const now = new Date()
   const stamp = `${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}`
   const random = Math.random().toString(36).slice(2, 6).toUpperCase()

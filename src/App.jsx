@@ -59,7 +59,8 @@ export default function App() {
       {route.page === 'browse' && <Browse products={products} navigate={navigate} />}
       {route.page === 'product' && <ProductDetail product={products.find((item) => item.id === route.id)} navigate={navigate} />}
       {route.page === 'sell' && <ListProduct navigate={navigate} />}
-      {!['home', 'browse', 'product', 'sell'].includes(route.page) && <NotFound navigate={navigate} />}
+      {route.page === 'contact' && <ContactPage />}
+      {!['home', 'browse', 'product', 'sell', 'contact'].includes(route.page) && <NotFound navigate={navigate} />}
     </main>
     <Footer navigate={navigate} />
   </div>
@@ -68,7 +69,7 @@ export default function App() {
 function Header({ navigate, menuOpen, setMenuOpen }) {
   return <header className="site-header">
     <button className="brand" onClick={() => navigate('home')} aria-label="Sahly home"><span className="brand-mark"><Baby /></span><span>Sahly</span></button>
-    <nav className={menuOpen ? 'main-nav open' : 'main-nav'}><button onClick={() => navigate('browse')}>Browse</button><button onClick={() => navigate('sell')}>Sell</button></nav>
+    <nav className={menuOpen ? 'main-nav open' : 'main-nav'}><button onClick={() => navigate('browse')}>Browse</button><button onClick={() => navigate('sell')}>Sell</button><button onClick={() => navigate('contact')}>Contact</button></nav>
     <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">{menuOpen ? <X /> : <Menu />}</button>
   </header>
 }
@@ -114,6 +115,30 @@ function ProductDetail({ product, navigate }) {
 }
 function Spec({ term, value }) { return <div><dt>{term}</dt><dd>{value}</dd></div> }
 function Advert({ advert, originalPrice }) { return <section className="advert-card"><span className="eyebrow plain">Rental offer</span><h2>{advert.headline}</h2>{advert.lines.map((line) => <p key={line}>{line}</p>)}<p><strong>₹{money(advert.deposit)} refundable security deposit.</strong></p><ul className="plan-list">{originalPrice && <li><span>Original price</span><strong>₹{money(originalPrice)}</strong></li>}{advert.plans.map((plan) => <li key={plan.label} className={plan.highlight ? 'highlight' : ''}><span>{plan.label}</span><strong className={plan.struck ? 'struck' : ''}>₹{money(plan.price)}</strong>{plan.badge && <em>{plan.badge}</em>}</li>)}<li><span>Security deposit</span><strong>₹{money(advert.deposit)} refundable</strong></li></ul></section> }
+
+function ContactPage() {
+  const [status, setStatus] = useState('form')
+  const [reference, setReference] = useState('')
+  const [error, setError] = useState('')
+  const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' })
+  const setField = (field, value) => setForm((current) => ({ ...current, [field]: value }))
+  const submit = async (event) => {
+    event.preventDefault()
+    if (status === 'sending') return
+    setError('')
+    setStatus('sending')
+    try {
+      const result = await postRentMessage({ messageType: 'contact', ...form })
+      setReference(result.reference)
+      setStatus('done')
+    } catch (err) {
+      setError(err.message || 'We could not send your message. Please try again.')
+      setStatus('form')
+    }
+  }
+
+  return <div className="contact-page page-wrap"><section className="contact-intro"><span className="eyebrow light">We’re here to help</span><h1>Let’s talk.</h1><p>Questions about a listing, renting, or getting started? Send us a note and our team will get back to you.</p><div className="contact-promise"><ShieldCheck /><span><strong>A real person reads every message.</strong> We usually reply within two business days.</span></div></section><section className="contact-form-wrap">{status === 'done' ? <div className="contact-success"><div className="success-icon"><Check /></div><span className="eyebrow plain">Message sent</span><h2>Thanks for reaching out.</h2><p>Your message is on its way to our team. We’ll reply to the email address you provided.</p>{reference && <p className="reference-code">Reference <strong>{reference}</strong></p>}</div> : <form className="contact-form" onSubmit={submit}><div className="form-header"><span>Contact Sahly</span><h2>How can we help?</h2></div><div className="form-grid"><Field label="Your name" required><input required autoComplete="name" value={form.name} onChange={(event) => setField('name', event.target.value)} /></Field><Field label="Email" required><input required type="email" autoComplete="email" value={form.email} onChange={(event) => setField('email', event.target.value)} placeholder="you@example.com" /></Field></div><Field label="Phone"><input type="tel" autoComplete="tel" value={form.phone} onChange={(event) => setField('phone', event.target.value)} placeholder="Optional" /></Field><Field label="Subject" required><input required maxLength="120" value={form.subject} onChange={(event) => setField('subject', event.target.value)} placeholder="What is this about?" /></Field><Field label="Message" required><textarea required rows="6" maxLength="2000" value={form.message} onChange={(event) => setField('message', event.target.value)} placeholder="Write your message..." /></Field>{error && <p className="form-error" role="alert">{error}</p>}<button className="button primary submit-button" type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'Sending…' : 'Send message'} <ArrowRight /></button></form>}</section></div>
+}
 
 function ListProduct() {
   const mode = 'sell'
@@ -199,4 +224,4 @@ function Modal({ children, onClose }) { return <div className="modal-backdrop" o
 function ModalSuccess({ text, reference }) { return <div className="modal-success"><div className="success-icon"><Check /></div><h2>All done.</h2><p>{text}</p>{reference && <p className="reference-code">Reference <strong>{reference}</strong></p>}</div> }
 
 function NotFound({ navigate, message = 'We couldn’t find that page.' }) { return <div className="success-page page-wrap"><span className="eyebrow plain">404</span><h1>{message}</h1><button className="button primary" onClick={() => navigate('home')}>Back to home</button></div> }
-function Footer({ navigate }) { return <footer><button className="brand footer-brand" onClick={() => navigate('home')}><span className="brand-mark"><Baby /></span><span>Sahly</span></button><p>Baby products have a short life. Give them a second one.</p><div><button onClick={() => navigate('browse')}>Browse</button><button onClick={() => navigate('sell')}>Sell</button></div><small>© 2026 Sahly · Bengaluru</small></footer> }
+function Footer({ navigate }) { return <footer><button className="brand footer-brand" onClick={() => navigate('home')}><span className="brand-mark"><Baby /></span><span>Sahly</span></button><p>Baby products have a short life. Give them a second one.</p><div><button onClick={() => navigate('browse')}>Browse</button><button onClick={() => navigate('sell')}>Sell</button><button onClick={() => navigate('contact')}>Contact</button></div><small>© 2026 Sahly · Bengaluru</small></footer> }
