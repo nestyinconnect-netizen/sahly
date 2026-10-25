@@ -9,7 +9,6 @@
     "not_found_handling": "single-page-application"
   },
   "vars": {
-    "NOTIFY_EMAIL": "hello@example.com",
     "FROM_EMAIL": "Sahly <hello@example.com>"
   }
 }

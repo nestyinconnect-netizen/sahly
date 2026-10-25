@@ -101,7 +101,7 @@ async function handleSubmit(request, env) {
   const reference = buildReference(type)
   const summary = summarise(type, payload, reference)
 
-  if (!env.RESEND_API_KEY || !env.NOTIFY_EMAIL || !env.FROM_EMAIL) {
+  if (!env.RESEND_API_KEY || !env.COORDINATOR_EMAIL || !env.FROM_EMAIL) {
     console.warn('Email is not configured; skipping send.')
     return json({ ok: true, reference, sent: false })
   }
@@ -110,7 +110,7 @@ async function handleSubmit(request, env) {
 
   const ownerEmail = {
     from: env.FROM_EMAIL,
-    to: [env.NOTIFY_EMAIL],
+    to: [env.COORDINATOR_EMAIL],
     reply_to: email,
     subject: `[${CATEGORY_LABEL[type]}] ${summary.subject}`,
     html: summary.ownerHtml,

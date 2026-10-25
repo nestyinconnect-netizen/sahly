@@ -25,18 +25,18 @@ The Worker uses [Resend](https://resend.com) because a single fetch call from Wo
 
 ```powershell
 # Public (stored in wrangler.jsonc)
-# NOTIFY_EMAIL — where submissions arrive (e.g. hello@yourdomain.com)
-# FROM_EMAIL   — verified sender (e.g. "Sahly <hello@yourdomain.com>")
+# FROM_EMAIL — verified sender (e.g. "Sahly <hello@yourdomain.com>")
 
 # Secret (never commit; store in Cloudflare)
 wrangler secret put RESEND_API_KEY
+wrangler secret put COORDINATOR_EMAIL
 ```
 
 For local Wrangler runs, put the same values in a `.dev.vars` file at the repo root:
 
 ```
 RESEND_API_KEY=re_xxx
-NOTIFY_EMAIL=hello@yourdomain.com
+COORDINATOR_EMAIL=hello@yourdomain.com
 FROM_EMAIL=Sahly <hello@yourdomain.com>
 ```
 
